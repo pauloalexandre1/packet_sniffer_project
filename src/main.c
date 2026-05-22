@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pcap/pcap.h>
+#include <sys/types.h>
 
 /* 
 
@@ -23,18 +24,40 @@ traffic present included (0 - the former; 1 - the latter). */
 the application (important for efficiency). */
 #define PACKET_BUFFER_TIMEOUT 100
 
+/* Maximum number of packets to be read during sniffing */
+#define NR_PACKETS_TO_BE_READ 10
 
+
+void process_packet(){
+
+}
 
 int main(int argc, const char* argv[]){
 
     /* Buffer to store errors. */
     char* error_buffer[PCAP_ERRBUF_SIZE];
 
+    /* Man page for pcap_open_live() subroutine recommends error_buffer to be initially set 
+    to 'zero-length string' in order to detect a warning (not error) caused by calling 
+    pcap_open_live(). */
+    error_buffer[0] = '\0';
+
     /* Open device DEVICE_INTERFACE for reading packets */
     pcap_t* handle = pcap_open_live(DEVICE_INTERFACE, SNAPSHOT_LENGTH, PROMISCUOUS_MODE, PACKET_BUFFER_TIMEOUT, error_buffer);
 
     if (handle == NULL){
-        printf("\nERROR: An error ocurred while calling pcap_open_live() routine! Error message: %s\n", error_buffer);
+        printf("\nERROR: An error ocurred while calling pcap_open_live()! Error message: %s\n", error_buffer);
+        return -1;
+    }
+
+    /* If pcap_open_live() call succeeded and the error buffer is not empty, then a warning 
+    was written to the buffer instead and needs to be displayed. */
+    else if (error_buffer[0] != '\0'){
+        printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: %s\n", error_buffer);
+    }
+
+    if ((pcap_loop(handle, NR_PACKETS_TO_BE_READ, process_packet, NULL)) <= 0){
+        printf("\nERROR: pcap_loop() failed!\n");
         return -1;
     }
 
