@@ -28,7 +28,7 @@ the application (important for efficiency). */
 #define NR_PACKETS_TO_BE_READ 10
 
 
-void process_packet(){
+void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const __u_char* packet_ptr){
 
 }
 
@@ -56,7 +56,8 @@ int main(int argc, const char* argv[]){
         printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: %s\n", error_buffer);
     }
 
-    if ((pcap_loop(handle, NR_PACKETS_TO_BE_READ, process_packet, NULL)) <= 0){
+    /* Process NR_PACKETS_TO_BE_READ packets arriving on handle device*/
+    if ((pcap_loop(handle, NR_PACKETS_TO_BE_READ, process_packet, (__u_char*) NULL)) <= 0){
         printf("\nERROR: pcap_loop() failed!\n");
         return -1;
     }
