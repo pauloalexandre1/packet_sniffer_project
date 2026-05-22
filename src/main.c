@@ -33,5 +33,10 @@ int main(int argc, const char* argv[]){
     /* Open device DEVICE_INTERFACE for reading packets */
     pcap_t* handle = pcap_open_live(DEVICE_INTERFACE, SNAPSHOT_LENGTH, PROMISCUOUS_MODE, PACKET_BUFFER_TIMEOUT, error_buffer);
 
+    if (handle == NULL){
+        printf("\nERROR: An error ocurred while calling pcap_open_live() routine! Error message: %s\n", error_buffer);
+        return -1;
+    }
+
     return 0;
 }
