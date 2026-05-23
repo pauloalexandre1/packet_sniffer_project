@@ -2,7 +2,7 @@
 Pet project involving the creation of a packet sniffer using the C programming language.
 
 # To compile
-Run <mark>make</mark>.
+Run ```make```.
 
 # To execute
-Run 'sudo ./program' (Unix).
+Run ```sudo ./program``` (Unix).
