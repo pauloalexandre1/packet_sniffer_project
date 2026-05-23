@@ -29,13 +29,13 @@ the application (important for efficiency). */
 
 
 void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const __u_char* packet_ptr){
-
+    printf("\nA packet has arrived!\n");
 }
 
 int main(int argc, const char* argv[]){
 
     /* Buffer to store errors. */
-    char* error_buffer[PCAP_ERRBUF_SIZE];
+    char error_buffer[PCAP_ERRBUF_SIZE];
 
     /* Man page for pcap_open_live() subroutine recommends error_buffer to be initially set 
     to 'zero-length string' in order to detect a warning (not error) caused by calling 
@@ -46,14 +46,14 @@ int main(int argc, const char* argv[]){
     pcap_t* handle = pcap_open_live(DEVICE_INTERFACE, SNAPSHOT_LENGTH, PROMISCUOUS_MODE, PACKET_BUFFER_TIMEOUT, error_buffer);
 
     if (handle == NULL){
-        printf("\nERROR: An error ocurred while calling pcap_open_live()! Error message: %s\n", error_buffer);
+        printf("ERROR: An error ocurred while calling pcap_open_live()! Error message: \"%s\".\n", error_buffer);
         return -1;
     }
 
     /* If pcap_open_live() call succeeded and the error buffer is not empty, then a warning 
     was written to the buffer instead and needs to be displayed. */
     else if (error_buffer[0] != '\0'){
-        printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: %s\n", error_buffer);
+        printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: \"%s\".\n", error_buffer);
     }
 
     /* Process NR_PACKETS_TO_BE_READ packets arriving on handle device*/
