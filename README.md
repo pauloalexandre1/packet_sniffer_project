@@ -5,4 +5,4 @@ Pet project involving the creation of a packet sniffer using the C programming l
 Run ```make```.
 
 # To execute
-Run ```sudo ./program``` (Unix).
+Unix: run ```sudo ./program```.

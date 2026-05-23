@@ -37,7 +37,7 @@ int main(int argc, const char* argv[]){
     /* Buffer to store errors. */
     char error_buffer[PCAP_ERRBUF_SIZE];
 
-    /* Man page for pcap_open_live() subroutine recommends error_buffer to be initially set 
+    /* Man page for pcap_open_live() function recommends error_buffer to be initially set 
     to 'zero-length string' in order to detect a warning (not error) caused by calling 
     pcap_open_live(). */
     error_buffer[0] = '\0';
@@ -52,12 +52,15 @@ int main(int argc, const char* argv[]){
 
     /* If pcap_open_live() call succeeded and the error buffer is not empty, then a warning 
     was written to the buffer instead and needs to be displayed. */
+    
     else if (error_buffer[0] != '\0'){
         printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: \"%s\".\n", error_buffer);
     }
 
-    /* Process NR_PACKETS_TO_BE_READ packets arriving on handle device*/
-    if ((pcap_loop(handle, NR_PACKETS_TO_BE_READ, process_packet, (__u_char*) NULL)) <= 0){
+    /* Process NR_PACKETS_TO_BE_READ packets arriving on handle device. */
+    /* pcap_loop() returns 0 on success. */
+
+    if ((pcap_loop(handle, NR_PACKETS_TO_BE_READ, process_packet, (__u_char*) NULL))){
         printf("\nERROR: pcap_loop() failed!\n");
         return -1;
     }
