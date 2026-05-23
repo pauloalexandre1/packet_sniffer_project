@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pcap/pcap.h>
 #include <sys/types.h>
+#include <time.h>
 
 /* 
 
@@ -29,7 +30,10 @@ the application (important for efficiency). */
 
 
 void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const __u_char* packet_ptr){
-    printf("\nA packet has arrived!\n");
+    time_t nowtime = pkthdr->ts.tv_sec;
+    struct tm *nowtm = localtime(&nowtime);
+
+    printf("\n %d/%d | %d:%d - A packet has arrived!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min);
 }
 
 int main(int argc, const char* argv[]){
@@ -52,7 +56,7 @@ int main(int argc, const char* argv[]){
 
     /* If pcap_open_live() call succeeded and the error buffer is not empty, then a warning 
     was written to the buffer instead and needs to be displayed. */
-    
+
     else if (error_buffer[0] != '\0'){
         printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: \"%s\".\n", error_buffer);
     }
