@@ -33,7 +33,7 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
     time_t nowtime = pkthdr->ts.tv_sec;
     struct tm *nowtm = localtime(&nowtime);
 
-    printf("\n %d/%d | %d:%d - A packet has arrived!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min);
+    printf("\n %d/%d | %d:%d - A packet has arrived (size: %u bytes)!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min, pkthdr->len);
 }
 
 int main(int argc, const char* argv[]){
