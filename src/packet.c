@@ -1,4 +1,4 @@
-#include "lib/packet.h"
+#include "../lib/packet.h"
 
 
 void process_ipv4_packet(struct iphdr *ip_header){
@@ -26,6 +26,25 @@ void process_ipv4_packet(struct iphdr *ip_header){
     */
     int time_to_live = ip_header->ttl;
 
+    /* 
+    Number of protocol of data unit encapsulated in this 
+    IPv4 datagram.
+    
+    Protocol in question could be upper-layer or could still 
+    be layer 3 (for example, ICMP) 
+    */
+    int protocol_number = ip_header->protocol;
+
+    switch(protocol_number){
+        case IPPROTO_ICMP:
+            /* ICMP (Internet Control Message Protocol) */
+            /* do something here... */
+            break;
+        default:
+            break;
+    }
+
+    printf("\nProtocol: %u\n", ip_header->protocol);
     printf("\nSource: %s\n", packet_source);
     printf("\nDestination: %s\n", packet_destination);
 }
