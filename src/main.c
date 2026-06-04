@@ -3,6 +3,8 @@
 #include <pcap/pcap.h>
 #include <sys/types.h>
 #include <time.h>
+#include <netinet/if_ether.h>
+#include <netinet/ip.h>
 
 /* 
 
@@ -28,12 +30,50 @@ the application (important for efficiency). */
 /* Maximum number of packets to be read during sniffing */
 #define NR_PACKETS_TO_BE_READ 10
 
+int datalink_header_length = 0;
 
 void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const __u_char* packet_ptr){
     time_t nowtime = pkthdr->ts.tv_sec;
     struct tm *nowtm = localtime(&nowtime);
 
-    printf("\n %d/%d | %d:%d - A packet has arrived (size: %u bytes)!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min, pkthdr->len);
+    const struct ethhdr *frame = (const struct ethhdr*) packet_ptr;
+
+    /* 
+    Network-layer datagram type ID (or any numerical value 
+    being transmitted on a network) might arrive in a different 
+    byte order (it arrives in "network byte order", ie. big endian). 
+    
+    For example, if the packet ID is 0x0800 (IPv4), then, in a 
+    little-endian machine, this value will be interpreted as 
+    0x0008 (not IPv4).
+
+    The ntohs() call ensures that the value is read correctly. 
+    From the example above: if the machine this program runs on 
+    is little-endian, then bytes 08 and 80 will be swapped. 
+    Otherwise, the order remains the same, as the machine is 
+    already in the same byte order as the network.
+    */
+    uint16_t packet_type = ntohs(frame->h_proto);
+    
+    switch(packet_type){
+        case ETH_P_IP:
+            process_ipv4_packet(); // to be defined...
+            break;
+        default:
+            printf("\nCan't work with this packet type!\n");
+            break;
+    }
+
+    /* Note: the section below will be modified later... */
+
+    /* Skip the data-link header and start at the payload (usually IP) */
+    packet_ptr = packet_ptr + datalink_header_length;
+
+    struct iphdr *ip_header = (struct iphdr*) packet_ptr;
+
+    printf("\nTTL: %u\n", ip_header->ttl);
+
+    printf("\n %d/%d | %d:%d - A packet has arrived (size: %u bytes)!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min, pkthdr->caplen);
 }
 
 int main(int argc, const char* argv[]){
@@ -59,6 +99,27 @@ int main(int argc, const char* argv[]){
 
     else if (error_buffer[0] != '\0'){
         printf("\nWARNING: A warning was generated after calling pcap_open_live(). Warning message: \"%s\".\n", error_buffer);
+    }
+
+    /* Determine the type of the frame header received. */
+    int datalink_header_type = pcap_datalink(handle);
+
+    /* 
+    You can add more options depending on the data-link header type 
+    of the frame you receive on interface DEVICE_INTERFACE.
+    */
+
+    switch(datalink_header_type){
+        case DLT_NULL:
+            datalink_header_length = 4; // 4 bytes for loopback header
+            break;
+        case DLT_EN10MB:
+            /* IEEE 802.3 Ethernet (10 Mb) */
+            datalink_header_length = 14; // 14 bytes (fixed length)
+            break;
+        default:
+            datalink_header_length = 0;
+            break;
     }
 
     /* Process NR_PACKETS_TO_BE_READ packets arriving on handle device. */
