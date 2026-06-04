@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pcap/pcap.h>
+#include "packet.h"
 #include <sys/types.h>
 #include <time.h>
-#include <netinet/if_ether.h>
-#include <netinet/ip.h>
 
 /* 
 
@@ -38,6 +36,9 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
 
     const struct ethhdr *frame = (const struct ethhdr*) packet_ptr;
 
+    /* Skip the data-link header and start at the payload (usually IP) */
+    packet_ptr = packet_ptr + datalink_header_length;
+
     /* 
     Network-layer datagram type ID (or any numerical value 
     being transmitted on a network) might arrive in a different 
@@ -56,22 +57,15 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
     uint16_t packet_type = ntohs(frame->h_proto);
     
     switch(packet_type){
+        /* IPv4 */
         case ETH_P_IP:
-            process_ipv4_packet(); // to be defined...
+            struct iphdr *ip_header = (struct iphdr*) packet_ptr;
+            process_ipv4_packet(ip_header);
             break;
         default:
             printf("\nCan't work with this packet type!\n");
             break;
     }
-
-    /* Note: the section below will be modified later... */
-
-    /* Skip the data-link header and start at the payload (usually IP) */
-    packet_ptr = packet_ptr + datalink_header_length;
-
-    struct iphdr *ip_header = (struct iphdr*) packet_ptr;
-
-    printf("\nTTL: %u\n", ip_header->ttl);
 
     printf("\n %d/%d | %d:%d - A packet has arrived (size: %u bytes)!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min, pkthdr->caplen);
 }
