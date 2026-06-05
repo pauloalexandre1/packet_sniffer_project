@@ -26,7 +26,7 @@ the application (important for efficiency). */
 #define PACKET_BUFFER_TIMEOUT 100
 
 /* Maximum number of packets to be read during sniffing */
-#define NR_PACKETS_TO_BE_READ 10
+#define NR_PACKETS_TO_BE_READ 500
 
 int datalink_header_length = 0;
 
@@ -56,6 +56,8 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
     */
     uint16_t packet_type = ntohs(frame->h_proto);
     
+    printf("\n %d:%d | ", nowtm->tm_hour, nowtm->tm_min);
+
     switch(packet_type){
         /* IPv4 */
         case ETH_P_IP:
@@ -67,7 +69,7 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
             break;
     }
 
-    printf("\n %d/%d | %d:%d - A packet has arrived (size: %u bytes)!\n", nowtm->tm_mday, nowtm->tm_mon+1, nowtm->tm_hour, nowtm->tm_min, pkthdr->caplen);
+    
 }
 
 int main(int argc, const char* argv[]){

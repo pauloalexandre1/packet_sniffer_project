@@ -1,5 +1,6 @@
 #include "../lib/packet.h"
 
+#define PROTOCOL_NAME_LENGTH 200
 
 void process_ipv4_packet(struct iphdr *ip_header){
     /* IP source address and IP destination address. */
@@ -26,6 +27,9 @@ void process_ipv4_packet(struct iphdr *ip_header){
     */
     int time_to_live = ip_header->ttl;
 
+    /* Upper-layer protocol name. */
+    char protocol_name[PROTOCOL_NAME_LENGTH];
+
     /* 
     Number of protocol of data unit encapsulated in this 
     IPv4 datagram.
@@ -38,13 +42,15 @@ void process_ipv4_packet(struct iphdr *ip_header){
     switch(protocol_number){
         case IPPROTO_ICMP:
             /* ICMP (Internet Control Message Protocol) */
-            /* do something here... */
+            strcpy(protocol_name, "ICMP"); // strcpy() adds '\0' character at the end, so this is correct.
             break;
         default:
+            strcpy(protocol_name, "Unknown");
             break;
     }
 
-    printf("\nProtocol: %u\n", ip_header->protocol);
-    printf("\nSource: %s\n", packet_source);
-    printf("\nDestination: %s\n", packet_destination);
+    printf("Source: %s | ", packet_source);
+    printf("Destination: %s | ", packet_destination);
+    printf("Protocol: %s | ", protocol_name);
+    printf("Length: %u bytes", ntohs(ip_header->tot_len)); // total length of the packet
 }
