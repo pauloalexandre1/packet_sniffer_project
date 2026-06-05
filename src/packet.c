@@ -35,7 +35,7 @@ void process_ipv4_packet(struct iphdr *ip_header){
     IPv4 datagram.
     
     Protocol in question could be upper-layer or could still 
-    be layer 3 (for example, ICMP) 
+    be layer 3 (for example, ICMP).
     */
     int protocol_number = ip_header->protocol;
 
@@ -44,6 +44,25 @@ void process_ipv4_packet(struct iphdr *ip_header){
             /* ICMP (Internet Control Message Protocol) */
             strcpy(protocol_name, "ICMP"); // strcpy() adds '\0' character at the end, so this is correct.
             break;
+        case IPPROTO_TCP:
+            /* TCP (Transmission Control Protocol) */
+            strcpy(protocol_name, "TCP");
+            break;
+        case IPPROTO_UDP:
+            /* UDP (User Datagram Protocol) */
+            strcpy(protocol_name, "UDP");
+            break;
+        case IPPROTO_IPV6:
+            /* 
+            IPv6 datagrams may be encapsulated in IPv4 datagrams. 
+            
+            This happens when IPv6 datagrams pass through an IPv4 
+            network.
+
+            This process is called "tunneling".
+            */
+           strcpy(protocol_name, "IPv6");
+           break;
         default:
             strcpy(protocol_name, "Unknown");
             break;
@@ -52,5 +71,6 @@ void process_ipv4_packet(struct iphdr *ip_header){
     printf("Source: %s | ", packet_source);
     printf("Destination: %s | ", packet_destination);
     printf("Protocol: %s | ", protocol_name);
-    printf("Length: %u bytes", ntohs(ip_header->tot_len)); // total length of the packet
+    printf("Length: %u bytes | ", ntohs(ip_header->tot_len)); // total length of the packet
+    printf("Info: N/A");
 }

@@ -30,6 +30,12 @@ the application (important for efficiency). */
 
 int datalink_header_length = 0;
 
+/* Print timestamp. */
+void print_timestamp(struct tm *nowtm){
+    printf("\n %d:%d | ", nowtm->tm_hour, nowtm->tm_min);
+}
+
+/* Parse data-link frame header to get actual packet. */
 void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const __u_char* packet_ptr){
     time_t nowtime = pkthdr->ts.tv_sec;
     struct tm *nowtm = localtime(&nowtime);
@@ -55,17 +61,24 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
     already in the same byte order as the network.
     */
     uint16_t packet_type = ntohs(frame->h_proto);
-    
-    printf("\n %d:%d | ", nowtm->tm_hour, nowtm->tm_min);
 
     switch(packet_type){
         /* IPv4 */
         case ETH_P_IP:
             struct iphdr *ip_header = (struct iphdr*) packet_ptr;
+            print_timestamp(nowtm);
             process_ipv4_packet(ip_header);
             break;
+        /* IPv6 */
+        case ETH_P_IPV6:
+            printf("\nThis is an IPv6 packet!\n");
+            break;
+        /* ARP (Address Resolution Protocol) */
+        case ETH_P_ARP:
+            printf("\nThis is an ARP packet!\n");
+            break;
         default:
-            printf("\nCan't work with this packet type!\n");
+            printf("\nCan't work with this packet type! Packet type: 0x%04X\n", packet_type);
             break;
     }
 
