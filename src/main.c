@@ -79,10 +79,11 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
 
     In order to distinguish between EtherType and size of the payload, 
     a standard was introduced (IEEE 802.3x-1997). This standard 
-    lays out the difference: if the value of this field exceeds 
+    lays out the difference: if the value of this field equals or exceeds 
     1536 bytes, then this is an EtherType field. If the value is 
     less than or equal to 1500 bytes, then the value indicates 
-    the size of the frame's payload.
+    the size of the frame's payload. Values greater than 1500 and less 
+    than 1536 don't have a meaningful interpretation.
 
     The reason for the use of two different framings/values in the 
     same Ethernet frame is beyond the scope of this comment. For 
