@@ -28,6 +28,7 @@ the application (important for efficiency). */
 /* Maximum number of packets to be read during sniffing */
 #define NR_PACKETS_TO_BE_READ 500
 
+/* Length of the data-link header (depending on each frame). */
 int datalink_header_length = 0;
 
 /* Print timestamp. */
@@ -62,10 +63,34 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
     */
     uint16_t packet_type = ntohs(frame->h_proto);
 
+    /*
+    The 2-byte 'EtherType' field is actually used for two 
+    different values, depending on the framing.
+
+    For Ethernet II frames, this field indicates 'EtherType', 
+    the protocol encapsulated in the frame.
+
+    For the standard IEEE 802.3 frame, this field represents 
+    the size of the payload of the frame.
+
+    Both of these two framings are used in the same Ethernet 
+    frame. This can lead to errors if one tries to incorrectly 
+    interpret this value as an EtherType field.
+
+    In order to distinguish between EtherType and size of the payload, 
+    a standard was introduced (IEEE 802.3x-1997). This standard 
+    lays out the difference: if the value of this field exceeds 
+    1536 bytes, then this is an EtherType field. If the value is 
+    less than or equal to 1500 bytes, then the value indicates 
+    the size of the frame's payload.
+
+    The reason for the use of two different framings/values in the 
+    same Ethernet frame is beyond the scope of this comment. For 
+    clarification on this, check more information online.
+    */
     if (packet_type <= 1500) {
-    printf("IEEE 802.3 frame (length=%u)\n",
-           packet_type);
-    return;
+        process_llc_header();
+        return;
     }
 
     switch(packet_type){
