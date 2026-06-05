@@ -56,11 +56,17 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
 
     The ntohs() call ensures that the value is read correctly. 
     From the example above: if the machine this program runs on 
-    is little-endian, then bytes 08 and 80 will be swapped. 
+    is little-endian, then bytes 08 and 00 will be swapped. 
     Otherwise, the order remains the same, as the machine is 
     already in the same byte order as the network.
     */
     uint16_t packet_type = ntohs(frame->h_proto);
+
+    if (packet_type <= 1500) {
+    printf("IEEE 802.3 frame (length=%u)\n",
+           packet_type);
+    return;
+    }
 
     switch(packet_type){
         /* IPv4 */
@@ -71,6 +77,9 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
             break;
         /* IPv6 */
         case ETH_P_IPV6:
+            //struct ipv6hdr *ipv6_header = (struct ipv6hdr*) packet_ptr;
+            //print_timestamp(nowtm);
+            //process_ipv6_packet(ipv6_header);
             printf("\nThis is an IPv6 packet!\n");
             break;
         /* ARP (Address Resolution Protocol) */

@@ -2,9 +2,19 @@
 
 #define PROTOCOL_NAME_LENGTH 200
 
+/* Print common information about packet. */
+void print_packet_information(char source_address[], char destination_address[], char protocol[], uint16_t total_length, char info[]){
+    printf("Source: %s | ", source_address);
+    printf("Destination: %s | ", destination_address);
+    printf("Protocol: %s | ", protocol);
+    printf("Length: %u bytes | ", total_length);
+    printf("Info: %s", info);
+}
+
 void process_ipv4_packet(struct iphdr *ip_header){
-    /* IP source address and IP destination address. */
+    /* Source IP address. */
     char packet_source[INET_ADDRSTRLEN];
+    /* Destination IP address. */
     char packet_destination[INET_ADDRSTRLEN];
 
     struct in_addr source, dest;
@@ -68,9 +78,15 @@ void process_ipv4_packet(struct iphdr *ip_header){
             break;
     }
 
-    printf("Source: %s | ", packet_source);
-    printf("Destination: %s | ", packet_destination);
-    printf("Protocol: %s | ", protocol_name);
-    printf("Length: %u bytes | ", ntohs(ip_header->tot_len)); // total length of the packet
-    printf("Info: N/A");
+    print_packet_information(packet_source, packet_destination, protocol_name, ntohs(ip_header->tot_len), "N/A");
+    
+}
+
+void process_ipv6_packet(struct ipv6hdr *ipv6_header){
+    /* Source IP address. */
+    char packet_source[INET6_ADDRSTRLEN];
+    /* Destination IP address. */
+    char packet_destination[INET6_ADDRSTRLEN];
+
+    /*...*/
 }
