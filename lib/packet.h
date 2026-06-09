@@ -8,6 +8,11 @@
 #include <string.h>
 #include <linux/ipv6.h>
 
+/* Print common information about packet. */
+void print_packet_information(char source_address[], char destination_address[], char protocol[], uint16_t total_length, char info[]);
+
+/* Determine protocol's name based on protocol_number and store the result in buffer protocol_name */
+void fill_out_protocol_name_buffer(int protocol_number, char* protocol_name);
 
 /* Parse IPv4 datagram and print its contents. */
 void process_ipv4_packet(struct iphdr *ip_header);

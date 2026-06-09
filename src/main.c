@@ -26,7 +26,7 @@ the application (important for efficiency). */
 #define PACKET_BUFFER_TIMEOUT 100
 
 /* Maximum number of packets to be read during sniffing */
-#define NR_PACKETS_TO_BE_READ 500
+#define NR_PACKETS_TO_BE_READ 50
 
 /* Length of the data-link header (depending on each frame). */
 int datalink_header_length = 0;
@@ -86,11 +86,11 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
     than 1536 don't have a meaningful interpretation.
 
     The reason for the use of two different framings/values in the 
-    same Ethernet frame is beyond the scope of this comment. For 
-    clarification on this, check more information online.
+    same Ethernet frame is beyond the scope of this comment. For the history 
+    behind the definition of this frame, check more information online.
     */
     if (packet_type <= 1500) {
-        process_llc_header();
+        //process_llc_header();
         return;
     }
 
@@ -103,10 +103,9 @@ void process_packet(__u_char* user_arg, const struct pcap_pkthdr* pkthdr, const 
             break;
         /* IPv6 */
         case ETH_P_IPV6:
-            //struct ipv6hdr *ipv6_header = (struct ipv6hdr*) packet_ptr;
-            //print_timestamp(nowtm);
-            //process_ipv6_packet(ipv6_header);
-            printf("\nThis is an IPv6 packet!\n");
+            struct ipv6hdr *ipv6_header = (struct ipv6hdr*) packet_ptr;
+            print_timestamp(nowtm);
+            process_ipv6_packet(ipv6_header);
             break;
         /* ARP (Address Resolution Protocol) */
         case ETH_P_ARP:
