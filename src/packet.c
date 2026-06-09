@@ -1,6 +1,7 @@
 #include "../lib/packet.h"
 
 #define PROTOCOL_NAME_LENGTH 200
+#define PACKET_INFO_LENGTH 400
 
 
 void print_packet_information(char source_address[], char destination_address[], char protocol[], uint16_t total_length, char info[]){
@@ -36,6 +37,10 @@ void fill_out_protocol_name_buffer(int protocol_number, char* protocol_name){
             */
            strcpy(protocol_name, "IPv6");
            break;
+        case IPPROTO_ICMPV6:
+            /* ICMP for IPv6 */
+            strcpy(protocol_name, "ICMP (v6)");
+            break;
         default:
             strcpy(protocol_name, "Unknown");
             break;
